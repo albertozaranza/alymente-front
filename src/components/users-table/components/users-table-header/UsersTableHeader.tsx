@@ -11,14 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TabsList, TabsTrigger } from "../../../ui/tabs";
 
 const UsersTableHeader = () => {
   return (
-    <div className="flex items-center">
-      <TabsList>
-        <TabsTrigger value="all">Todos</TabsTrigger>
-      </TabsList>
+    <div className="flex items-center mb-4">
       <div className="ml-auto flex items-center gap-2">
         <Dialog>
           <DialogTrigger asChild>

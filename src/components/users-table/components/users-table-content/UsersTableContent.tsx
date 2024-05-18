@@ -1,9 +1,10 @@
+import { useLayoutEffect, useState } from "react";
+
 import { TabsContent } from "../../../ui/tabs";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "../../../ui/card";
@@ -26,52 +27,101 @@ import {
 
 import UserInfo from "./components/user-info";
 
-const users = [
-  {
-    name: "Laser",
-    status: "Active",
-    price: "$199.99",
-    totalSales: 30,
-    createdAt: "2024-02-14 02:14 PM",
-  },
-  {
-    name: "Lemonade",
-    status: "Active",
-    price: "$199.99",
-    totalSales: 30,
-    createdAt: "2024-02-14 02:14 PM",
-  },
-  {
-    name: "Machine",
-    status: "Active",
-    price: "$199.99",
-    totalSales: 30,
-    createdAt: "2024-02-14 02:14 PM",
-  },
-];
+import api from "@/infra/api";
+
+import { User } from "@/types/users";
+import LoadingState from "./components/loading-state";
 
 const UsersTableContent = () => {
+  const [users, setUsers] = useState<User[] | undefined>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  useLayoutEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+
+        const response = await api.get(`api/v1/users?page=${currentPage}`);
+
+        setUsers(response.data.data);
+        setTotalPages(response.data.count / 10);
+
+        setIsLoading(false);
+      } catch (e) {
+        setHasError(true);
+      }
+    })();
+  }, [currentPage]);
+
+  if (hasError) {
+    return <Card x-chunk="dashboard-06-chunk-0">Error</Card>;
+  }
+
   return (
     <TabsContent value="all">
       <Card x-chunk="dashboard-06-chunk-0">
-        <CardHeader>
-          <CardTitle>Usuários</CardTitle>
-          <CardDescription>
-            Gerencie as informações de seus usuários
-          </CardDescription>
+        <CardHeader className="flex flex-row">
+          <div className="flex-1">
+            <CardTitle>Usuários</CardTitle>
+            <CardDescription className="mt-2">
+              Gerencie as informações de seus usuários
+            </CardDescription>
+          </div>
+          <Pagination className="flex-0 w-min">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={handlePreviousPage}
+                  href="#"
+                  className={
+                    currentPage <= 1
+                      ? "pointer-events-none opacity-50"
+                      : undefined
+                  }
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">{currentPage}</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  onClick={handleNextPage}
+                  href="#"
+                  className={
+                    currentPage >= totalPages
+                      ? "pointer-events-none opacity-50"
+                      : undefined
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden md:table-cell">Price</TableHead>
+                <TableHead>Nome</TableHead>
                 <TableHead className="hidden md:table-cell">
-                  Total Sales
-                </TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Created at
+                  Data de criação
                 </TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
@@ -79,37 +129,16 @@ const UsersTableContent = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map(({ name, price, status, totalSales, createdAt }) => (
-                <UserInfo
-                  key={name}
-                  name={name}
-                  price={price}
-                  status={status}
-                  totalSales={totalSales}
-                  createdAt={createdAt}
-                />
-              ))}
+              {isLoading ? (
+                <LoadingState />
+              ) : (
+                users?.map(({ name, createdAt }) => (
+                  <UserInfo key={name} name={name} createdAt={createdAt} />
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
-        <CardFooter>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href="#" />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </CardFooter>
       </Card>
     </TabsContent>
   );

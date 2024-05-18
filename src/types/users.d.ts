@@ -1,0 +1,23 @@
+export type User = {
+  id: string;
+  name: string;
+  age: number;
+  cpf: string;
+  rg: string;
+  birthDate: Date;
+  gender: string;
+  sign: string;
+  mother: string;
+  father: string;
+  landline: string;
+  phone: string;
+  height: number;
+  weight: number;
+  bloodType: string;
+  color: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  credential: Credential;
+  addresses: Address[];
+};

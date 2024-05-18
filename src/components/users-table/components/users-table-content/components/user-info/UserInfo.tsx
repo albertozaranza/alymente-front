@@ -13,28 +13,16 @@ import { TableCell, TableRow } from "@/components/ui/table";
 
 type UserInfoProps = {
   name: string;
-  price: string;
-  status: string;
-  totalSales: number;
-  createdAt: string;
+  createdAt: Date;
 };
 
-const UserInfo = ({
-  name,
-  price,
-  status,
-  totalSales,
-  createdAt,
-}: UserInfoProps) => {
+const UserInfo = ({ name, createdAt }: UserInfoProps) => {
   return (
     <TableRow>
       <TableCell className="font-medium">{name}</TableCell>
-      <TableCell>
-        <Badge variant="outline">{status}</Badge>
+      <TableCell className="hidden md:table-cell">
+        {createdAt.toString()}
       </TableCell>
-      <TableCell className="hidden md:table-cell">{price}</TableCell>
-      <TableCell className="hidden md:table-cell">{totalSales}</TableCell>
-      <TableCell className="hidden md:table-cell">{createdAt}</TableCell>
       <TableCell>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

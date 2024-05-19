@@ -43,6 +43,7 @@ const UsersTableContent = () => {
     handleNextPage,
     handlePreviousPage,
     updateUser,
+    deleteUser,
   } = useUsersTable();
 
   useLayoutEffect(() => {
@@ -126,7 +127,12 @@ const UsersTableContent = () => {
                     <LoadingState />
                   ) : (
                     users?.map((user) => (
-                      <UserInfo key={user.id} user={user} onEdit={updateUser} />
+                      <UserInfo
+                        key={user.id}
+                        user={user}
+                        onEdit={updateUser}
+                        onDelete={deleteUser}
+                      />
                     ))
                   )}
                 </TableBody>

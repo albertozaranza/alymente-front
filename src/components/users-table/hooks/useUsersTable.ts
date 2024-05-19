@@ -62,6 +62,25 @@ export const useUsersTable = () => {
     }
   };
 
+  const deleteUser = async (id: string) => {
+    try {
+      await api.delete(`api/v1/users/${id}`);
+
+      toast({
+        title: "Sucesso!",
+        description: "Usuário deletado!",
+      });
+
+      fetchData();
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Algo deu errado!",
+        description: "Tente novamente.",
+      });
+    }
+  };
+
   return {
     users,
     isLoading,
@@ -70,6 +89,7 @@ export const useUsersTable = () => {
     totalPages,
     fetchData,
     updateUser,
+    deleteUser,
     handleNextPage,
     handlePreviousPage,
   };

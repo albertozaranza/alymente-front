@@ -1,4 +1,5 @@
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect } from "react";
+import { AlertCircle } from "lucide-react";
 
 import { TabsContent } from "../../../ui/tabs";
 import {
@@ -24,53 +25,29 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import UserInfo from "./components/user-info";
-
-import api from "@/infra/api";
-
-import { User } from "@/types/users";
 import LoadingState from "./components/loading-state";
 
+import { useUsersTable } from "../../hooks/useUsersTable";
+
 const UsersTableContent = () => {
-  const [users, setUsers] = useState<User[] | undefined>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const {
+    users,
+    isLoading,
+    hasError,
+    currentPage,
+    totalPages,
+    fetchData,
+    handleNextPage,
+    handlePreviousPage,
+    updateUser,
+  } = useUsersTable();
 
   useLayoutEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-
-        const response = await api.get(`api/v1/users?page=${currentPage}`);
-
-        setUsers(response.data.data);
-        setTotalPages(response.data.count / 10);
-
-        setIsLoading(false);
-      } catch (e) {
-        setHasError(true);
-      }
-    })();
-  }, [currentPage]);
-
-  if (hasError) {
-    return <Card x-chunk="dashboard-06-chunk-0">Error</Card>;
-  }
+    fetchData();
+  }, [fetchData]);
 
   return (
     <TabsContent value="all">
@@ -82,61 +59,79 @@ const UsersTableContent = () => {
               Gerencie as informações de seus usuários
             </CardDescription>
           </div>
-          <Pagination className="flex-0 w-min">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={handlePreviousPage}
-                  href="#"
-                  className={
-                    currentPage <= 1
-                      ? "pointer-events-none opacity-50"
-                      : undefined
-                  }
-                />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">{currentPage}</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  onClick={handleNextPage}
-                  href="#"
-                  className={
-                    currentPage >= totalPages
-                      ? "pointer-events-none opacity-50"
-                      : undefined
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          {!hasError && (
+            <Pagination className="flex-0 w-min">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={handlePreviousPage}
+                    href="#"
+                    className={
+                      currentPage <= 1
+                        ? "pointer-events-none opacity-50"
+                        : undefined
+                    }
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#">{currentPage}</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={handleNextPage}
+                    href="#"
+                    className={
+                      currentPage >= totalPages
+                        ? "pointer-events-none opacity-50"
+                        : undefined
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Data de criação
-                </TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <LoadingState />
-              ) : (
-                users?.map(({ name, createdAt }) => (
-                  <UserInfo key={name} name={name} createdAt={createdAt} />
-                ))
-              )}
-            </TableBody>
+            {hasError ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                  Não foi possível recuperar as informações dos usuários
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Nome</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Idade
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Data de nascimento
+                    </TableHead>
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <LoadingState />
+                  ) : (
+                    users?.map((user) => (
+                      <UserInfo key={user.id} user={user} onEdit={updateUser} />
+                    ))
+                  )}
+                </TableBody>
+              </>
+            )}
           </Table>
         </CardContent>
       </Card>

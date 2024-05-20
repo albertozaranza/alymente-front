@@ -8,13 +8,16 @@ const LoadingState = () => {
       {arr.map((key) => (
         <TableRow key={key}>
           <TableCell className="font-medium">
-            <Skeleton className="h-8 w-[500px]" />
+            <Skeleton className="h-8 w-[100px]" />
+          </TableCell>
+          <TableCell className="font-medium">
+            <Skeleton className="h-8 w-[100px]" />
           </TableCell>
           <TableCell className="hidden md:table-cell">
-            <Skeleton className="h-8 w-[500px]" />
+            <Skeleton className="h-8 w-[100px]" />
           </TableCell>
           <TableCell className="hidden md:table-cell">
-            <Skeleton className="h-8 w-[500px]" />
+            <Skeleton className="h-8 w-[100px]" />
           </TableCell>
         </TableRow>
       ))}

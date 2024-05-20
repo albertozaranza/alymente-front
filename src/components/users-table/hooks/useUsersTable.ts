@@ -6,6 +6,11 @@ import api from "@/infra/api";
 
 import { User } from "@/types/users";
 
+export type PostParams = {
+  name: string;
+  birthDate: Date;
+};
+
 export const useUsersTable = () => {
   const [users, setUsers] = useState<User[] | undefined>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,6 +45,25 @@ export const useUsersTable = () => {
       setHasError(true);
     }
   }, [currentPage]);
+
+  const createUser = async (params: PostParams) => {
+    try {
+      await api.post(`api/v1/users/`, params);
+
+      toast({
+        title: "Sucesso!",
+        description: "Informações atualizadas!",
+      });
+
+      fetchData();
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Algo deu errado!",
+        description: "Tente novamente.",
+      });
+    }
+  };
 
   const updateUser = async (id: string, newName: string) => {
     try {
@@ -88,6 +112,7 @@ export const useUsersTable = () => {
     currentPage,
     totalPages,
     fetchData,
+    createUser,
     updateUser,
     deleteUser,
     handleNextPage,

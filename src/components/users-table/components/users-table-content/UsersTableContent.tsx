@@ -39,7 +39,7 @@ const UsersTableContent = () => {
     hasError,
     currentPage,
     totalPages,
-    fetchData,
+    getUsers,
     handleNextPage,
     handlePreviousPage,
     updateUser,
@@ -47,8 +47,8 @@ const UsersTableContent = () => {
   } = useUsersTable();
 
   useLayoutEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    getUsers();
+  }, [getUsers]);
 
   return (
     <TabsContent value="all">

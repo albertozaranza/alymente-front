@@ -13,6 +13,7 @@ export type PostParams = {
 
 export const useUsersTable = () => {
   const [users, setUsers] = useState<User[] | undefined>([]);
+  const [user, setUser] = useState<User | undefined>();
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,7 +33,7 @@ export const useUsersTable = () => {
     }
   };
 
-  const fetchData = useCallback(async () => {
+  const getUsers = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -46,6 +47,19 @@ export const useUsersTable = () => {
     }
   }, [currentPage]);
 
+  const getUserById = useCallback(async (id: string) => {
+    try {
+      setIsLoading(true);
+
+      const response = await api.get(`api/v1/users/${id}`);
+
+      setUser(response.data);
+      setIsLoading(false);
+    } catch (e) {
+      setHasError(true);
+    }
+  }, []);
+
   const createUser = async (params: PostParams) => {
     try {
       await api.post(`api/v1/users/`, params);
@@ -55,7 +69,7 @@ export const useUsersTable = () => {
         description: "Informações atualizadas!",
       });
 
-      fetchData();
+      getUsers();
     } catch (e) {
       toast({
         variant: "destructive",
@@ -76,7 +90,7 @@ export const useUsersTable = () => {
         description: "Informações atualizadas!",
       });
 
-      fetchData();
+      getUsers();
     } catch (e) {
       toast({
         variant: "destructive",
@@ -95,7 +109,7 @@ export const useUsersTable = () => {
         description: "Usuário deletado!",
       });
 
-      fetchData();
+      getUsers();
     } catch (e) {
       toast({
         variant: "destructive",
@@ -106,12 +120,14 @@ export const useUsersTable = () => {
   };
 
   return {
+    user,
     users,
     isLoading,
     hasError,
     currentPage,
     totalPages,
-    fetchData,
+    getUsers,
+    getUserById,
     createUser,
     updateUser,
     deleteUser,

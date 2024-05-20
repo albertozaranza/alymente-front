@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 import { MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,14 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@/components/ui/table";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -60,6 +59,9 @@ const UserInfo = ({ user, onEdit, onDelete }: UserInfoProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <Link href={`/user/${id}`}>
+                  <DropdownMenuItem>Detalhes</DropdownMenuItem>
+                </Link>
                 <Trigger value={dialogs.Edit}>
                   <DropdownMenuItem>Editar</DropdownMenuItem>
                 </Trigger>
